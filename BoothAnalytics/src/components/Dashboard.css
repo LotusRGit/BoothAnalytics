@@ -52,6 +52,29 @@
   background: var(--bg);
 }
 
+.btn-preset {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn-preset:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-preset.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
 .btn-reset-date {
   padding: 4px 12px;
   border: 1px solid var(--border);

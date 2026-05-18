@@ -108,6 +108,64 @@ export default function Dashboard({ data, fileName }) {
     setEndDate(maxDate)
   }
 
+  // ── 期間プリセット ─────────────────────────────────────────────
+  // データ範囲にクランプした上で、重なりがなければ null を返す
+  function clamp(dateStr) {
+    if (dateStr < minDate) return minDate
+    if (dateStr > maxDate) return maxDate
+    return dateStr
+  }
+
+  const datePresets = useMemo(() => {
+    const now   = new Date()
+    const year  = now.getFullYear()
+    const month = now.getMonth() + 1
+    const pad   = n => String(n).padStart(2, '0')
+
+    const lastMonthDate = new Date(year, month - 2, 1)
+    const lastMonthYear = lastMonthDate.getFullYear()
+    const lastMonth     = lastMonthDate.getMonth() + 1
+    const lastMonthEnd  = new Date(year, month - 1, 0)
+
+    const candidates = [
+      {
+        label: '今月',
+        start: `${year}-${pad(month)}-01`,
+        end:   `${year}-${pad(month)}-${pad(new Date(year, month, 0).getDate())}`,
+      },
+      {
+        label: '先月',
+        start: `${lastMonthYear}-${pad(lastMonth)}-01`,
+        end:   `${lastMonthYear}-${pad(lastMonth)}-${pad(lastMonthEnd.getDate())}`,
+      },
+      {
+        label: '今年',
+        start: `${year}-01-01`,
+        end:   `${year}-12-31`,
+      },
+      {
+        label: '去年',
+        start: `${year - 1}-01-01`,
+        end:   `${year - 1}-12-31`,
+      },
+    ]
+
+    // データ範囲と重なるプリセットのみ表示（クランプ後に start > end になるものは除外）
+    return candidates
+      .map(p => ({ ...p, start: clamp(p.start), end: clamp(p.end) }))
+      .filter(p => p.start <= p.end)
+  }, [minDate, maxDate])
+
+  function applyPreset(preset) {
+    setStartDate(preset.start)
+    setEndDate(preset.end)
+  }
+
+  // 現在の選択がプリセットと一致するか判定
+  function isPresetActive(preset) {
+    return startDate === preset.start && endDate === preset.end
+  }
+
   return (
     <div className="dashboard">
       {/* ── トップバー ── */}
@@ -118,6 +176,15 @@ export default function Dashboard({ data, fileName }) {
           {/* 日付フィルター */}
           <div className="date-filter">
             <label>期間：</label>
+            {datePresets.map(p => (
+              <button
+                key={p.label}
+                className={`btn-preset ${isPresetActive(p) ? 'active' : ''}`}
+                onClick={() => applyPreset(p)}
+              >
+                {p.label}
+              </button>
+            ))}
             <input type="date" value={startDate} min={minDate} max={endDate}
               onChange={e => setStartDate(e.target.value)} />
             <span>〜</span>
