@@ -56,11 +56,11 @@ export default function Dashboard({ data, fileName }) {
   }, [minDate, maxDate])
 
   // ── フィルタリング ─────────────────────────────────────────────
-  const filterRows = (rows, start, end) => {
+  const filterRows = (src, start, end) => {
     const s = new Date(start)
     const e = new Date(end)
     e.setHours(23, 59, 59)
-    const byDate = rows.filter(r => r.date >= s && r.date <= e)
+    const byDate = src.filter(r => r.date >= s && r.date <= e)
     if (selectedProducts.length === 0) return byDate
     return byDate.filter(r => selectedProducts.includes(r.product))
   }
