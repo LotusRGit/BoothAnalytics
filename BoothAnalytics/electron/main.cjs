@@ -11,11 +11,14 @@ const PROXY_PORT = 57172
 const DATA_FILE  = path.join(app.getPath('userData'), 'booth-data.json')
 
 // ── データ永続化 IPC ────────────────────────────────────────────
-ipcMain.handle('store:save', (_, data) => {
+ipcMain.handle('store:save', async (_, data) => {
+  const tmp = DATA_FILE + '.tmp'
   try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data), 'utf-8')
+    await fs.promises.writeFile(tmp, JSON.stringify(data), 'utf-8')
+    await fs.promises.rename(tmp, DATA_FILE)
     return { ok: true }
   } catch (e) {
+    try { await fs.promises.unlink(tmp) } catch {}
     return { ok: false, error: e.message }
   }
 })

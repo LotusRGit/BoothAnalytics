@@ -11,11 +11,18 @@ function serializeData(data) {
     rows: data.rows.map(r => ({ ...r, date: r.date.toISOString() })),
   }
 }
+
 function deserializeData(raw) {
-  return {
-    ...raw,
-    rows: raw.rows.map(r => ({ ...r, date: new Date(r.date) })),
+  if (!raw || !Array.isArray(raw.rows) || raw.rows.length === 0) {
+    throw new Error('invalid schema')
   }
+  const rows = raw.rows.map(r => {
+    const date = new Date(r.date)
+    if (isNaN(date.getTime())) throw new Error('invalid date')
+    if (typeof r.amount !== 'number') throw new Error('invalid amount')
+    return { ...r, date }
+  })
+  return { ...raw, rows }
 }
 
 export default function App() {

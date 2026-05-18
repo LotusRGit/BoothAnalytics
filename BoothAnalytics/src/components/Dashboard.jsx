@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef } from 'react'
+import { useMemo, useState, useRef, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 import SalesSummary from './SalesSummary'
 import SalesTrend from './SalesTrend'
@@ -17,6 +17,7 @@ export default function Dashboard({ data, fileName }) {
   const { rows } = data
   const [page, setPage]           = useState('overview')
   const [compareMode, setCompare] = useState(false)
+  const [exporting, setExporting] = useState(false)
   const exportRef                 = useRef(null)
 
   // ── 商品一覧 & フィルター ──────────────────────────────────────
@@ -46,6 +47,14 @@ export default function Dashboard({ data, fileName }) {
   const [cmpStart, setCmpStart] = useState(minDate)
   const [cmpEnd, setCmpEnd]     = useState(maxDate)
 
+  // data が切り替わったとき（永続データ復元後を含む）に日付範囲をリセット
+  useEffect(() => {
+    setStartDate(minDate)
+    setEndDate(maxDate)
+    setCmpStart(minDate)
+    setCmpEnd(maxDate)
+  }, [minDate, maxDate])
+
   // ── フィルタリング ─────────────────────────────────────────────
   const filterRows = (rows, start, end) => {
     const s = new Date(start)
@@ -73,17 +82,25 @@ export default function Dashboard({ data, fileName }) {
 
   // ── PNG エクスポート ───────────────────────────────────────────
   async function handleExport() {
-    if (!exportRef.current) return
-    const canvas = await html2canvas(exportRef.current, {
-      backgroundColor: getComputedStyle(document.documentElement)
-        .getPropertyValue('--card').trim() || '#ffffff',
-      scale: 2,
-      useCORS: true,
-    })
-    const link = document.createElement('a')
-    link.download = `booth-analytics-${startDate}-${endDate}.png`
-    link.href = canvas.toDataURL('image/png')
-    link.click()
+    if (!exportRef.current || exporting) return
+    setExporting(true)
+    try {
+      const canvas = await html2canvas(exportRef.current, {
+        backgroundColor: getComputedStyle(document.documentElement)
+          .getPropertyValue('--card').trim() || '#ffffff',
+        scale: 2,
+        useCORS: true,
+      })
+      const link = document.createElement('a')
+      const suffix = compareMode
+        ? `${startDate}-${endDate}_vs_${cmpStart}-${cmpEnd}`
+        : `${startDate}-${endDate}`
+      link.download = `booth-analytics-${suffix}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } finally {
+      setExporting(false)
+    }
   }
 
   function resetDateRange() {
@@ -118,8 +135,8 @@ export default function Dashboard({ data, fileName }) {
           </button>
 
           {/* エクスポート */}
-          <button className="btn-export" onClick={handleExport} title="PNG で保存">
-            ↓ PNG
+          <button className="btn-export" onClick={handleExport} disabled={exporting} title="PNG で保存">
+            {exporting ? '⏳' : '↓ PNG'}
           </button>
         </div>
       </div>
