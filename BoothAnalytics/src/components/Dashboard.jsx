@@ -7,6 +7,7 @@ import MonthlyDetail from './MonthlyDetail'
 import HeatMap from './HeatMap'
 import DayOfMonthChart from './DayOfMonthChart'
 import RepeatAnalysis from './RepeatAnalysis'
+import ProductFilterDropdown from './ProductFilterDropdown'
 import './Dashboard.css'
 
 function toDateStr(date) {
@@ -17,19 +18,15 @@ export default function Dashboard({ data, fileName }) {
   const { rows } = data
   const [page, setPage]           = useState('overview')
   const [compareMode, setCompare] = useState(false)
-  const [exporting, setExporting] = useState(false)
-  const exportRef                 = useRef(null)
+  const [exporting, setExporting]     = useState(false)
+  const [exportError, setExportError] = useState(false)
+  const [maskAmounts, setMaskAmounts] = useState(false)
+  const exportRef                     = useRef(null)
 
   // ── 商品一覧 & フィルター ──────────────────────────────────────
   const allProducts = useMemo(() =>
     [...new Set(rows.map(r => r.product))].sort(), [rows])
   const [selectedProducts, setSelectedProducts] = useState([])
-
-  function toggleProduct(p) {
-    setSelectedProducts(prev =>
-      prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]
-    )
-  }
 
   // ── 日付範囲（メイン） ─────────────────────────────────────────
   const [minDate, maxDate] = useMemo(() => {
@@ -84,6 +81,7 @@ export default function Dashboard({ data, fileName }) {
   async function handleExport() {
     if (!exportRef.current || exporting) return
     setExporting(true)
+    setExportError(false)
     try {
       const canvas = await html2canvas(exportRef.current, {
         backgroundColor: getComputedStyle(document.documentElement)
@@ -98,6 +96,9 @@ export default function Dashboard({ data, fileName }) {
       link.download = `booth-analytics-${suffix}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
+    } catch {
+      setExportError(true)
+      setTimeout(() => setExportError(false), 3000)
     } finally {
       setExporting(false)
     }
@@ -202,8 +203,17 @@ export default function Dashboard({ data, fileName }) {
           </button>
 
           {/* エクスポート */}
+          <label className={`btn-mask ${maskAmounts ? 'active' : ''}`} title="PNG出力時に金額をマスク">
+            <input
+              type="checkbox"
+              checked={maskAmounts}
+              onChange={e => setMaskAmounts(e.target.checked)}
+              style={{ display: 'none' }}
+            />
+            {maskAmounts ? 'マスク中' : '金額マスク'}
+          </label>
           <button className="btn-export" onClick={handleExport} disabled={exporting} title="PNG で保存">
-            {exporting ? '⏳' : '↓ PNG'}
+            {exporting ? '⏳' : exportError ? '❌ 失敗' : '↓ PNG'}
           </button>
         </div>
       </div>
@@ -222,25 +232,11 @@ export default function Dashboard({ data, fileName }) {
 
       {/* ── 商品フィルター ── */}
       {allProducts.length > 1 && (
-        <div className="product-filter">
-          <span className="filter-label">商品：</span>
-          <div className="filter-chips">
-            <button
-              className={`chip ${selectedProducts.length === 0 ? 'active' : ''}`}
-              onClick={() => setSelectedProducts([])}
-            >すべて</button>
-            {allProducts.map(p => (
-              <button
-                key={p}
-                className={`chip ${selectedProducts.includes(p) ? 'active' : ''}`}
-                onClick={() => toggleProduct(p)}
-                title={p}
-              >
-                {p.length > 20 ? p.slice(0, 18) + '…' : p}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ProductFilterDropdown
+          products={allProducts}
+          selected={selectedProducts}
+          onChange={setSelectedProducts}
+        />
       )}
 
       {/* ── ページナビ ── */}
@@ -262,7 +258,7 @@ export default function Dashboard({ data, fileName }) {
       </div>
 
       {/* ── コンテンツ（エクスポート対象） ── */}
-      <div ref={exportRef}>
+      <div ref={exportRef} data-masked={maskAmounts || undefined}>
         {compareMode ? (
           <div className="compare-grid">
             <div className="compare-col">
