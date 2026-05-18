@@ -1,0 +1,124 @@
+.heatmap-card {
+  overflow: hidden;
+}
+
+/* period-toggle は SalesTrend と同じクラスを流用 */
+.period-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.period-toggle button {
+  padding: 5px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.period-toggle button.active {
+  background: var(--primary);
+  color: white;
+}
+
+.period-toggle button:not(.active):hover {
+  background: var(--bg);
+}
+
+/* ── グリッド ── */
+.heatmap-wrap {
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: 28px repeat(24, 32px);
+  grid-template-rows: 20px repeat(7, 32px);
+  gap: 3px;
+  min-width: max-content;
+}
+
+.heatmap-corner {
+  /* 左上の空白 */
+}
+
+.heatmap-hour-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 2px;
+}
+
+.heatmap-day-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heatmap-day-label.weekend {
+  color: #e11d48;
+}
+
+.heatmap-cell {
+  border-radius: 4px;
+  cursor: default;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+  z-index: 1;
+  position: relative;
+}
+
+/* ── ホバー情報 ── */
+.heatmap-info {
+  margin-top: 14px;
+  min-height: 22px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.heatmap-hint {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* ── 凡例 ── */
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.legend-text {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.legend-bar {
+  display: flex;
+  height: 12px;
+  width: 120px;
+  border-radius: 4px;
+  overflow: hidden;
+  gap: 1px;
+}
+
+.legend-bar > div {
+  flex: 1;
+}

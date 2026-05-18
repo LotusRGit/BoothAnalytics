@@ -1,0 +1,52 @@
+.dom-card {
+  /* .card の継承で十分 */
+}
+
+.dom-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dom-top-stat {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.dom-top-stat strong {
+  color: #d97706;
+  font-size: 15px;
+}
+
+.dom-note {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.dom-tooltip {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.dom-tooltip-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.dom-tooltip-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.dom-tooltip-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}

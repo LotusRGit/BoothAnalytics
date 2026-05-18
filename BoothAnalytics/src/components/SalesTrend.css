@@ -1,0 +1,93 @@
+.trend-card {
+  min-height: 360px;
+}
+
+.period-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.period-toggle button {
+  padding: 5px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.period-toggle button.active {
+  background: var(--primary);
+  color: white;
+}
+
+.period-toggle button:not(.active):hover {
+  background: var(--bg);
+}
+
+.chart-tooltip {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  box-shadow: var(--shadow-lg);
+}
+
+.tooltip-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.tooltip-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.tooltip-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.tooltip-release {
+  font-size: 11px;
+  color: #d97706;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+/* ヘッダー右側のコントロール群 */
+.trend-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.release-toggle {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.release-toggle:hover {
+  border-color: #f59e0b;
+  color: #d97706;
+}
+
+.release-toggle.active {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #d97706;
+}

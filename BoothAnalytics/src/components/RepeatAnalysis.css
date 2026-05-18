@@ -1,0 +1,152 @@
+.repeat-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.no-data-msg {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ── KPI ── */
+.repeat-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) { .repeat-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px) { .repeat-kpi-grid { grid-template-columns: 1fr 1fr; } }
+
+.repeat-kpi-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  border-top: 3px solid var(--accent);
+}
+
+/* MonthlyDetail.css の .kpi-label / .kpi-value に依存しないよう自己定義 */
+.repeat-kpi-card .kpi-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.repeat-kpi-card .kpi-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+/* ── 分布グラフ凡例 ── */
+.dist-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.dist-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: 12px;
+}
+
+.dist-dot:first-child { margin-left: 0; }
+.dist-dot.new    { background: #cbd5e1; }
+.dist-dot.repeat { background: #4f46e5; }
+
+/* ── リピーターテーブル ── */
+.repeat-badge {
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--bg);
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.repeat-table-wrap {
+  overflow-x: auto;
+}
+
+.repeat-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.repeat-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.repeat-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.repeat-table tr:last-child td { border-bottom: none; }
+.repeat-table tr:hover td { background: #fafbff; }
+
+/* 列ごとのスタイルを .repeat-table 配下に限定して他コンポーネントと競合しない */
+.repeat-table .col-rank  { width: 48px; text-align: center; }
+.repeat-table .col-right { text-align: right; }
+.repeat-table .col-bar   { width: 140px; padding-left: 16px; }
+
+.repeat-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--bg);
+  color: var(--text-muted);
+}
+
+.repeat-rank-badge.rank-1 { background: #fef3c7; color: #b45309; }
+.repeat-rank-badge.rank-2 { background: #f1f5f9; color: #475569; }
+.repeat-rank-badge.rank-3 { background: #fef3c7; color: #92400e; opacity: 0.8; }
+
+.repeat-table .col-user {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.repeat-table .col-orders  { font-weight: 700; color: #10b981; text-align: right; }
+.repeat-table .col-revenue { font-weight: 700; color: var(--primary); text-align: right; }
+
+.repeat-bar-track {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.repeat-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #818cf8, #4f46e5);
+  border-radius: 99px;
+}

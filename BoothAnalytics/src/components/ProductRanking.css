@@ -1,0 +1,170 @@
+.ranking-card {
+  overflow: hidden;
+}
+
+.sort-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.sort-toggle button {
+  padding: 5px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.sort-toggle button.active {
+  background: var(--primary);
+  color: white;
+}
+
+.sort-toggle button:not(.active):hover {
+  background: var(--bg);
+}
+
+.ranking-table-wrap {
+  overflow-x: auto;
+}
+
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ranking-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ranking-table td {
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.ranking-table tr:last-child td {
+  border-bottom: none;
+}
+
+.ranking-table tr:hover td {
+  background: #fafbff;
+}
+
+.th-rank, .td-rank {
+  width: 48px;
+  text-align: center;
+}
+
+.th-thumb, .td-thumb {
+  width: 52px;
+  padding-right: 0;
+}
+
+.td-thumb {
+  vertical-align: middle;
+}
+
+.th-right, .td-right {
+  text-align: right;
+}
+
+.th-bar, .td-bar {
+  width: 140px;
+  padding-left: 16px;
+}
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--bg);
+  color: var(--text-muted);
+}
+
+.rank-badge.rank-1 {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.rank-badge.rank-2 {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.rank-badge.rank-3 {
+  background: #fef3c7;
+  color: #92400e;
+  opacity: 0.8;
+}
+
+.td-name {
+  max-width: 260px;
+}
+
+.td-name .first-sale-date {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.td-revenue {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.td-qty {
+  color: var(--text-muted);
+}
+
+.bar-track {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #818cf8, #4f46e5);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.show-more-btn {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.show-more-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #eef2ff;
+}
