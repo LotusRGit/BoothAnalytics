@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef } from 'react'
+import html2canvas from 'html2canvas'
 import SalesSummary from './SalesSummary'
 import SalesTrend from './SalesTrend'
 import ProductRanking from './ProductRanking'
@@ -14,8 +15,22 @@ function toDateStr(date) {
 
 export default function Dashboard({ data, fileName }) {
   const { rows } = data
-  const [page, setPage] = useState('overview')
+  const [page, setPage]           = useState('overview')
+  const [compareMode, setCompare] = useState(false)
+  const exportRef                 = useRef(null)
 
+  // ── 商品一覧 & フィルター ──────────────────────────────────────
+  const allProducts = useMemo(() =>
+    [...new Set(rows.map(r => r.product))].sort(), [rows])
+  const [selectedProducts, setSelectedProducts] = useState([])
+
+  function toggleProduct(p) {
+    setSelectedProducts(prev =>
+      prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]
+    )
+  }
+
+  // ── 日付範囲（メイン） ─────────────────────────────────────────
   const [minDate, maxDate] = useMemo(() => {
     const dates = rows.map(r => r.date)
     return [
@@ -25,16 +40,28 @@ export default function Dashboard({ data, fileName }) {
   }, [rows])
 
   const [startDate, setStartDate] = useState(minDate)
-  const [endDate, setEndDate] = useState(maxDate)
+  const [endDate, setEndDate]     = useState(maxDate)
 
-  const filtered = useMemo(() => {
-    const s = new Date(startDate)
-    const e = new Date(endDate)
+  // ── 日付範囲（比較用） ─────────────────────────────────────────
+  const [cmpStart, setCmpStart] = useState(minDate)
+  const [cmpEnd, setCmpEnd]     = useState(maxDate)
+
+  // ── フィルタリング ─────────────────────────────────────────────
+  const filterRows = (rows, start, end) => {
+    const s = new Date(start)
+    const e = new Date(end)
     e.setHours(23, 59, 59)
-    return rows.filter(r => r.date >= s && r.date <= e)
-  }, [rows, startDate, endDate])
+    const byDate = rows.filter(r => r.date >= s && r.date <= e)
+    if (selectedProducts.length === 0) return byDate
+    return byDate.filter(r => selectedProducts.includes(r.product))
+  }
 
-  // 全データから商品ごとの初回売上日を算出（フィルター影響なし）
+  const filtered    = useMemo(() => filterRows(rows, startDate, endDate),
+    [rows, startDate, endDate, selectedProducts])
+  const filteredCmp = useMemo(() => filterRows(rows, cmpStart, cmpEnd),
+    [rows, cmpStart, cmpEnd, selectedProducts])
+
+  // 初回売上日（全データから算出）
   const firstSaleDates = useMemo(() => {
     const map = new Map()
     for (const r of rows) {
@@ -44,6 +71,21 @@ export default function Dashboard({ data, fileName }) {
     return map
   }, [rows])
 
+  // ── PNG エクスポート ───────────────────────────────────────────
+  async function handleExport() {
+    if (!exportRef.current) return
+    const canvas = await html2canvas(exportRef.current, {
+      backgroundColor: getComputedStyle(document.documentElement)
+        .getPropertyValue('--card').trim() || '#ffffff',
+      scale: 2,
+      useCORS: true,
+    })
+    const link = document.createElement('a')
+    link.download = `booth-analytics-${startDate}-${endDate}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  }
+
   function resetDateRange() {
     setStartDate(minDate)
     setEndDate(maxDate)
@@ -51,29 +93,73 @@ export default function Dashboard({ data, fileName }) {
 
   return (
     <div className="dashboard">
+      {/* ── トップバー ── */}
       <div className="dashboard-topbar">
-        <div className="file-tag">📄 {fileName} — {rows.length.toLocaleString()} 件のデータ</div>
-        <div className="date-filter">
-          <label>期間：</label>
-          <input
-            type="date"
-            value={startDate}
-            min={minDate}
-            max={endDate}
-            onChange={e => setStartDate(e.target.value)}
-          />
-          <span>〜</span>
-          <input
-            type="date"
-            value={endDate}
-            min={startDate}
-            max={maxDate}
-            onChange={e => setEndDate(e.target.value)}
-          />
-          <button className="btn-reset-date" onClick={resetDateRange}>全期間</button>
+        <div className="file-tag">📄 {fileName} — {rows.length.toLocaleString()} 件</div>
+
+        <div className="topbar-controls">
+          {/* 日付フィルター */}
+          <div className="date-filter">
+            <label>期間：</label>
+            <input type="date" value={startDate} min={minDate} max={endDate}
+              onChange={e => setStartDate(e.target.value)} />
+            <span>〜</span>
+            <input type="date" value={endDate} min={startDate} max={maxDate}
+              onChange={e => setEndDate(e.target.value)} />
+            <button className="btn-reset-date" onClick={resetDateRange}>全期間</button>
+          </div>
+
+          {/* 比較モード */}
+          <button
+            className={`btn-compare ${compareMode ? 'active' : ''}`}
+            onClick={() => setCompare(m => !m)}
+          >
+            ⇄ 比較
+          </button>
+
+          {/* エクスポート */}
+          <button className="btn-export" onClick={handleExport} title="PNG で保存">
+            ↓ PNG
+          </button>
         </div>
       </div>
 
+      {/* ── 比較期間セレクター ── */}
+      {compareMode && (
+        <div className="compare-bar">
+          <span className="compare-label">比較期間：</span>
+          <input type="date" value={cmpStart} min={minDate} max={cmpEnd}
+            onChange={e => setCmpStart(e.target.value)} />
+          <span>〜</span>
+          <input type="date" value={cmpEnd} min={cmpStart} max={maxDate}
+            onChange={e => setCmpEnd(e.target.value)} />
+        </div>
+      )}
+
+      {/* ── 商品フィルター ── */}
+      {allProducts.length > 1 && (
+        <div className="product-filter">
+          <span className="filter-label">商品：</span>
+          <div className="filter-chips">
+            <button
+              className={`chip ${selectedProducts.length === 0 ? 'active' : ''}`}
+              onClick={() => setSelectedProducts([])}
+            >すべて</button>
+            {allProducts.map(p => (
+              <button
+                key={p}
+                className={`chip ${selectedProducts.includes(p) ? 'active' : ''}`}
+                onClick={() => toggleProduct(p)}
+                title={p}
+              >
+                {p.length > 20 ? p.slice(0, 18) + '…' : p}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── ページナビ ── */}
       <div className="page-nav">
         {[
           { id: 'overview', label: '全体レポート' },
@@ -91,21 +177,55 @@ export default function Dashboard({ data, fileName }) {
         ))}
       </div>
 
-      {page === 'overview' && (
-        <>
-          <SalesSummary rows={filtered} />
-          <SalesTrend rows={filtered} firstSaleDates={firstSaleDates} />
-          <ProductRanking rows={filtered} firstSaleDates={firstSaleDates} />
-        </>
-      )}
-      {page === 'monthly' && <MonthlyDetail rows={filtered} firstSaleDates={firstSaleDates} />}
-      {page === 'heatmap' && (
-        <>
-          <HeatMap rows={filtered} />
-          <DayOfMonthChart rows={filtered} />
-        </>
-      )}
-      {page === 'repeat'  && <RepeatAnalysis rows={filtered} />}
+      {/* ── コンテンツ（エクスポート対象） ── */}
+      <div ref={exportRef}>
+        {compareMode ? (
+          <div className="compare-grid">
+            <div className="compare-col">
+              <div className="compare-col-label">
+                📅 {startDate} 〜 {endDate}
+              </div>
+              <SalesSummary rows={filtered} />
+              {page === 'overview' && (
+                <>
+                  <SalesTrend rows={filtered} firstSaleDates={firstSaleDates} />
+                  <ProductRanking rows={filtered} firstSaleDates={firstSaleDates} />
+                </>
+              )}
+            </div>
+            <div className="compare-col">
+              <div className="compare-col-label">
+                📅 {cmpStart} 〜 {cmpEnd}
+              </div>
+              <SalesSummary rows={filteredCmp} />
+              {page === 'overview' && (
+                <>
+                  <SalesTrend rows={filteredCmp} firstSaleDates={firstSaleDates} />
+                  <ProductRanking rows={filteredCmp} firstSaleDates={firstSaleDates} />
+                </>
+              )}
+            </div>
+          </div>
+        ) : (
+          <>
+            {page === 'overview' && (
+              <>
+                <SalesSummary rows={filtered} />
+                <SalesTrend rows={filtered} firstSaleDates={firstSaleDates} />
+                <ProductRanking rows={filtered} firstSaleDates={firstSaleDates} />
+              </>
+            )}
+            {page === 'monthly' && <MonthlyDetail rows={filtered} firstSaleDates={firstSaleDates} />}
+            {page === 'heatmap' && (
+              <>
+                <HeatMap rows={filtered} />
+                <DayOfMonthChart rows={filtered} />
+              </>
+            )}
+            {page === 'repeat' && <RepeatAnalysis rows={filtered} />}
+          </>
+        )}
+      </div>
     </div>
   )
 }
