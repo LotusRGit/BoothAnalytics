@@ -1,15 +1,50 @@
 'use strict'
 
-const { app, BrowserWindow, shell } = require('electron')
+const { app, BrowserWindow, shell, ipcMain } = require('electron')
 const path = require('path')
 const http  = require('http')
 const https = require('https')
+const fs    = require('fs')
 
 const isDev = !app.isPackaged
 const PROXY_PORT = 57172
+const DATA_FILE  = path.join(app.getPath('userData'), 'booth-data.json')
+
+// ── データ永続化 IPC ────────────────────────────────────────────
+ipcMain.handle('store:save', async (_, data) => {
+  const tmp = DATA_FILE + '.tmp'
+  try {
+    await fs.promises.writeFile(tmp, JSON.stringify(data), 'utf-8')
+    await fs.promises.rename(tmp, DATA_FILE)
+    return { ok: true }
+  } catch (e) {
+    try { await fs.promises.unlink(tmp) } catch {}
+    return { ok: false, error: e.message }
+  }
+})
+
+ipcMain.handle('store:load', () => {
+  try {
+    if (!fs.existsSync(DATA_FILE)) return null
+    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'))
+  } catch {
+    return null
+  }
+})
+
+ipcMain.handle('store:clear', () => {
+  try {
+    if (fs.existsSync(DATA_FILE)) fs.unlinkSync(DATA_FILE)
+    return { ok: true }
+  } catch (e) {
+    return { ok: false, error: e.message }
+  }
+})
+
+// ── アプリバージョン IPC ────────────────────────────────────────
+ipcMain.handle('app:version', () => app.getVersion())
 
 // ── Booth プロキシサーバー ──────────────────────────────────────
-// booth.pm/ja/items/{id} の HTML を取得して返す（og:image 抽出用）
 function startProxyServer(callback) {
   function fetchWithRedirect(urlStr, res, hop = 0) {
     if (hop > 5) { res.writeHead(500); res.end(); return }
@@ -68,7 +103,6 @@ function createWindow() {
     },
   })
 
-  // 外部リンクはブラウザで開く
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
     return { action: 'deny' }
@@ -82,7 +116,6 @@ function createWindow() {
 }
 
 // ── 起動 ────────────────────────────────────────────────────────
-
 app.whenReady().then(() => {
   startProxyServer(() => {
     createWindow()

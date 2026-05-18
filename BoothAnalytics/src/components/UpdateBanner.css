@@ -1,0 +1,36 @@
+.update-banner {
+  background: #ecfdf5;
+  border-bottom: 1px solid #6ee7b7;
+  color: #065f46;
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+[data-theme='dark'] .update-banner {
+  background: #064e3b;
+  border-color: #34d399;
+  color: #a7f3d0;
+}
+
+.update-link {
+  font-weight: 600;
+  color: #059669;
+  text-decoration: underline;
+}
+
+.update-dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  font-size: 14px;
+  padding: 2px 4px;
+}
+
+.update-dismiss:hover {
+  opacity: 1;
+}
