@@ -1,0 +1,102 @@
+.monthly-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--bg);
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.monthly-table-wrap {
+  overflow-x: auto;
+}
+
+.monthly-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.monthly-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.monthly-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.monthly-table tr:last-child td {
+  border-bottom: none;
+}
+
+.monthly-table tr:hover td {
+  background: #fafbff;
+}
+
+.th-right,
+.td-right {
+  text-align: right;
+}
+
+.td-month {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.td-revenue {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.growth-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.growth-badge.up {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.growth-badge.down {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.growth-na {
+  color: var(--text-muted);
+}
+
+.td-top-product {
+  min-width: 180px;
+  max-width: 260px;
+}
+
+.top-product-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-product-name {
+  font-size: 13px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
