@@ -41,7 +41,7 @@ export default function UpdateBanner() {
         if (!currentRaw) return
 
         // dismiss 済みのバージョンと一致する場合はスキップ
-        // ※ 両方 null の初回起動では dismiss !== null が false になるためスキップしない
+        // ※ 両方 null の初回起動では dismissedTag !== null が false になるためスキップしない
         const dismissedTag = localStorage.getItem(LS_DISMISSED)
         const cachedTag    = localStorage.getItem(LS_LATEST_TAG)
         if (dismissedTag !== null && dismissedTag === cachedTag) return

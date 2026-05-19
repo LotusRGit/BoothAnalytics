@@ -44,12 +44,13 @@ export default function Dashboard({ data, fileName }) {
   const [cmpStart, setCmpStart] = useState(minDate)
   const [cmpEnd, setCmpEnd]     = useState(maxDate)
 
-  // data が切り替わったとき（永続データ復元後を含む）に日付範囲をリセット
+  // data が切り替わったとき（永続データ復元後を含む）に日付範囲と商品フィルターをリセット
   useEffect(() => {
     setStartDate(minDate)
     setEndDate(maxDate)
     setCmpStart(minDate)
     setCmpEnd(maxDate)
+    setSelectedProducts([])
   }, [minDate, maxDate])
 
   // ── フィルタリング ─────────────────────────────────────────────
