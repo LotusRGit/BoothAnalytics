@@ -1,0 +1,14 @@
+# すべてのテキストファイルを LF に正規化
+* text=auto eol=lf
+
+# Windows バッチファイルは CRLF が必要
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# バイナリファイル
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.exe binary
+*.7z binary
