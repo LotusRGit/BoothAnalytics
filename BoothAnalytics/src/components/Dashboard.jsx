@@ -17,7 +17,8 @@ export default function Dashboard({ data, fileName }) {
   const { rows } = data
   const [page, setPage]           = useState('overview')
   const [compareMode, setCompare] = useState(false)
-  const [exporting, setExporting] = useState(false)
+  const [exporting, setExporting]     = useState(false)
+  const [exportError, setExportError] = useState(false)
   const exportRef                 = useRef(null)
 
   // ── 商品一覧 & フィルター ──────────────────────────────────────
@@ -47,12 +48,13 @@ export default function Dashboard({ data, fileName }) {
   const [cmpStart, setCmpStart] = useState(minDate)
   const [cmpEnd, setCmpEnd]     = useState(maxDate)
 
-  // data が切り替わったとき（永続データ復元後を含む）に日付範囲をリセット
+  // data が切り替わったとき（永続データ復元後を含む）に日付範囲と商品フィルターをリセット
   useEffect(() => {
     setStartDate(minDate)
     setEndDate(maxDate)
     setCmpStart(minDate)
     setCmpEnd(maxDate)
+    setSelectedProducts([])
   }, [minDate, maxDate])
 
   // ── フィルタリング ─────────────────────────────────────────────
@@ -84,6 +86,7 @@ export default function Dashboard({ data, fileName }) {
   async function handleExport() {
     if (!exportRef.current || exporting) return
     setExporting(true)
+    setExportError(false)
     try {
       const canvas = await html2canvas(exportRef.current, {
         backgroundColor: getComputedStyle(document.documentElement)
@@ -98,6 +101,9 @@ export default function Dashboard({ data, fileName }) {
       link.download = `booth-analytics-${suffix}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
+    } catch {
+      setExportError(true)
+      setTimeout(() => setExportError(false), 3000)
     } finally {
       setExporting(false)
     }
@@ -136,7 +142,7 @@ export default function Dashboard({ data, fileName }) {
 
           {/* エクスポート */}
           <button className="btn-export" onClick={handleExport} disabled={exporting} title="PNG で保存">
-            {exporting ? '⏳' : '↓ PNG'}
+            {exporting ? '⏳' : exportError ? '❌ 失敗' : '↓ PNG'}
           </button>
         </div>
       </div>
