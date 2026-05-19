@@ -7,6 +7,7 @@ import MonthlyDetail from './MonthlyDetail'
 import HeatMap from './HeatMap'
 import DayOfMonthChart from './DayOfMonthChart'
 import RepeatAnalysis from './RepeatAnalysis'
+import ProductFilterDropdown from './ProductFilterDropdown'
 import './Dashboard.css'
 
 function toDateStr(date) {
@@ -19,18 +20,13 @@ export default function Dashboard({ data, fileName }) {
   const [compareMode, setCompare] = useState(false)
   const [exporting, setExporting]     = useState(false)
   const [exportError, setExportError] = useState(false)
-  const exportRef                 = useRef(null)
+  const [maskAmounts, setMaskAmounts] = useState(false)
+  const exportRef                     = useRef(null)
 
   // ── 商品一覧 & フィルター ──────────────────────────────────────
   const allProducts = useMemo(() =>
     [...new Set(rows.map(r => r.product))].sort(), [rows])
   const [selectedProducts, setSelectedProducts] = useState([])
-
-  function toggleProduct(p) {
-    setSelectedProducts(prev =>
-      prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]
-    )
-  }
 
   // ── 日付範囲（メイン） ─────────────────────────────────────────
   const [minDate, maxDate] = useMemo(() => {
@@ -114,6 +110,64 @@ export default function Dashboard({ data, fileName }) {
     setEndDate(maxDate)
   }
 
+  // ── 期間プリセット ─────────────────────────────────────────────
+  // データ範囲にクランプした上で、重なりがなければ null を返す
+  function clamp(dateStr) {
+    if (dateStr < minDate) return minDate
+    if (dateStr > maxDate) return maxDate
+    return dateStr
+  }
+
+  const datePresets = useMemo(() => {
+    const now   = new Date()
+    const year  = now.getFullYear()
+    const month = now.getMonth() + 1
+    const pad   = n => String(n).padStart(2, '0')
+
+    const lastMonthDate = new Date(year, month - 2, 1)
+    const lastMonthYear = lastMonthDate.getFullYear()
+    const lastMonth     = lastMonthDate.getMonth() + 1
+    const lastMonthEnd  = new Date(year, month - 1, 0)
+
+    const candidates = [
+      {
+        label: '今月',
+        start: `${year}-${pad(month)}-01`,
+        end:   `${year}-${pad(month)}-${pad(new Date(year, month, 0).getDate())}`,
+      },
+      {
+        label: '先月',
+        start: `${lastMonthYear}-${pad(lastMonth)}-01`,
+        end:   `${lastMonthYear}-${pad(lastMonth)}-${pad(lastMonthEnd.getDate())}`,
+      },
+      {
+        label: '今年',
+        start: `${year}-01-01`,
+        end:   `${year}-12-31`,
+      },
+      {
+        label: '去年',
+        start: `${year - 1}-01-01`,
+        end:   `${year - 1}-12-31`,
+      },
+    ]
+
+    // データ範囲と重なるプリセットのみ表示（クランプ後に start > end になるものは除外）
+    return candidates
+      .map(p => ({ ...p, start: clamp(p.start), end: clamp(p.end) }))
+      .filter(p => p.start <= p.end)
+  }, [minDate, maxDate])
+
+  function applyPreset(preset) {
+    setStartDate(preset.start)
+    setEndDate(preset.end)
+  }
+
+  // 現在の選択がプリセットと一致するか判定
+  function isPresetActive(preset) {
+    return startDate === preset.start && endDate === preset.end
+  }
+
   return (
     <div className="dashboard">
       {/* ── トップバー ── */}
@@ -124,6 +178,15 @@ export default function Dashboard({ data, fileName }) {
           {/* 日付フィルター */}
           <div className="date-filter">
             <label>期間：</label>
+            {datePresets.map(p => (
+              <button
+                key={p.label}
+                className={`btn-preset ${isPresetActive(p) ? 'active' : ''}`}
+                onClick={() => applyPreset(p)}
+              >
+                {p.label}
+              </button>
+            ))}
             <input type="date" value={startDate} min={minDate} max={endDate}
               onChange={e => setStartDate(e.target.value)} />
             <span>〜</span>
@@ -141,6 +204,15 @@ export default function Dashboard({ data, fileName }) {
           </button>
 
           {/* エクスポート */}
+          <label className={`btn-mask ${maskAmounts ? 'active' : ''}`} title="PNG出力時に金額をマスク">
+            <input
+              type="checkbox"
+              checked={maskAmounts}
+              onChange={e => setMaskAmounts(e.target.checked)}
+              style={{ display: 'none' }}
+            />
+            {maskAmounts ? 'マスク中' : '金額マスク'}
+          </label>
           <button className="btn-export" onClick={handleExport} disabled={exporting} title="PNG で保存">
             {exporting ? '⏳' : exportError ? '❌ 失敗' : '↓ PNG'}
           </button>
@@ -161,25 +233,11 @@ export default function Dashboard({ data, fileName }) {
 
       {/* ── 商品フィルター ── */}
       {allProducts.length > 1 && (
-        <div className="product-filter">
-          <span className="filter-label">商品：</span>
-          <div className="filter-chips">
-            <button
-              className={`chip ${selectedProducts.length === 0 ? 'active' : ''}`}
-              onClick={() => setSelectedProducts([])}
-            >すべて</button>
-            {allProducts.map(p => (
-              <button
-                key={p}
-                className={`chip ${selectedProducts.includes(p) ? 'active' : ''}`}
-                onClick={() => toggleProduct(p)}
-                title={p}
-              >
-                {p.length > 20 ? p.slice(0, 18) + '…' : p}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ProductFilterDropdown
+          products={allProducts}
+          selected={selectedProducts}
+          onChange={setSelectedProducts}
+        />
       )}
 
       {/* ── ページナビ ── */}
@@ -201,7 +259,7 @@ export default function Dashboard({ data, fileName }) {
       </div>
 
       {/* ── コンテンツ（エクスポート対象） ── */}
-      <div ref={exportRef}>
+      <div ref={exportRef} data-masked={maskAmounts || undefined}>
         {compareMode ? (
           <div className="compare-grid">
             <div className="compare-col">

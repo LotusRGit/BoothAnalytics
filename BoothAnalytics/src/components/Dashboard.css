@@ -52,6 +52,29 @@
   background: var(--bg);
 }
 
+.btn-preset {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn-preset:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-preset.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
 .btn-reset-date {
   padding: 4px 12px;
   border: 1px solid var(--border);
@@ -73,6 +96,51 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.btn-mask {
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.btn-mask:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-mask.active {
+  background: #fef3c7;
+  border-color: #d97706;
+  color: #92400e;
+}
+
+[data-theme='dark'] .btn-mask.active {
+  background: #451a03;
+  border-color: #d97706;
+  color: #fcd34d;
+}
+
+/* ── 金額マスク ── */
+/* SalesSummary の KPI 値（総売上・注文数・平均単価・商品種類数） */
+[data-masked] .summary-value,
+/* ProductRanking の売上列・数量列 */
+[data-masked] .td-revenue,
+[data-masked] .td-qty,
+/* グラフの縦軸ラベル */
+[data-masked] .recharts-yAxis text,
+/* MonthlyDetail の金額 */
+[data-masked] .top1-revenue,
+[data-masked] .product-card-revenue {
+  filter: blur(6px);
+  user-select: none;
 }
 
 .btn-compare,
@@ -161,51 +229,6 @@
   border: 1px solid var(--border);
 }
 
-/* ── 商品フィルター ── */
-.product-filter {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.filter-label {
-  font-size: 13px;
-  color: var(--text-muted);
-  padding-top: 5px;
-  white-space: nowrap;
-}
-
-.filter-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.chip {
-  padding: 4px 12px;
-  border: 1px solid var(--border);
-  border-radius: 99px;
-  background: var(--card);
-  color: var(--text-muted);
-  font-size: 12px;
-  transition: all 0.15s;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.chip:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-.chip.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-}
 
 /* ── ページナビ ── */
 .page-nav {

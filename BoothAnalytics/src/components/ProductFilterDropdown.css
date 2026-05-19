@@ -1,0 +1,165 @@
+.pf-container {
+  position: relative;
+}
+
+/* ── トリガーボタン ── */
+.pf-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.pf-trigger:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.pf-trigger.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--card));
+}
+
+.pf-caret {
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+/* ── ドロップダウン ── */
+.pf-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 200;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── 検索 ── */
+.pf-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pf-search-icon {
+  font-size: 13px;
+  opacity: 0.5;
+}
+
+.pf-search {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+}
+
+.pf-search::placeholder {
+  color: var(--text-muted);
+}
+
+.pf-clear-query {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 2px 4px;
+  opacity: 0.6;
+}
+
+.pf-clear-query:hover {
+  opacity: 1;
+}
+
+/* ── リスト ── */
+.pf-list {
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.pf-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+  transition: background 0.1s;
+}
+
+.pf-item:hover {
+  background: var(--bg);
+}
+
+.pf-item input[type="checkbox"] {
+  accent-color: var(--primary);
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.pf-item-all {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.pf-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pf-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.pf-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ── フッター ── */
+.pf-footer {
+  border-top: 1px solid var(--border);
+  padding: 8px 12px;
+}
+
+.pf-reset {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}

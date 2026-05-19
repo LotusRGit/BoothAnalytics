@@ -40,18 +40,19 @@ export default function UpdateBanner() {
           : null
         if (!currentRaw) return
 
-        // dismiss 済みのバージョンなら何もしない
-        if (localStorage.getItem(LS_DISMISSED) === localStorage.getItem(LS_LATEST_TAG)) {
-          return
-        }
+        // dismiss 済みのバージョンと一致する場合はスキップ
+        // ※ 両方 null の初回起動では dismissedTag !== null が false になるためスキップしない
+        const dismissedTag = localStorage.getItem(LS_DISMISSED)
+        const cachedTag    = localStorage.getItem(LS_LATEST_TAG)
+        if (dismissedTag !== null && dismissedTag === cachedTag) return
 
         // 最後のチェックから1日以内ならキャッシュを使う
         const lastChecked = Number(localStorage.getItem(LS_CHECKED_AT) ?? 0)
         const now = Date.now()
 
         let tag, url
-        if (now - lastChecked < CHECK_INTERVAL_MS) {
-          tag = localStorage.getItem(LS_LATEST_TAG)
+        if (cachedTag && now - lastChecked < CHECK_INTERVAL_MS) {
+          tag = cachedTag
           url = localStorage.getItem(LS_LATEST_URL)
         } else {
           const res = await fetch(GITHUB_RELEASES_API)
@@ -65,7 +66,6 @@ export default function UpdateBanner() {
         }
 
         if (tag && compareVersions(tag, currentRaw) > 0) {
-          // dismiss 済みのバージョンと一致しなければ表示
           if (localStorage.getItem(LS_DISMISSED) !== tag) {
             setUpdate({ latest: tag, url })
           }
